@@ -38,7 +38,7 @@ pub fn get_tool_version(command: &str, flags: &[&str], keyword: Option<&str>) ->
 
     // Split by newline and take the first line.
     let binding = stdout.split('\n').collect::<Vec<&str>>();
-    let line = binding.get(0)?;
+    let line = binding.first()?;
 
     // If a keyword is provided, look for it in the line. If not found, return None.
     if let Some(keyword) = keyword {
@@ -73,7 +73,7 @@ pub fn get_tool_version_xtensa(
 
     // Split by newline and take the first line.
     let binding = stdout.split('\n').collect::<Vec<&str>>();
-    let line = binding.get(0)?;
+    let line = binding.first()?;
 
     // If a keyword is provided, look for it in the line. If not found, return None.
     if let Some(keyword) = keyword {
@@ -139,17 +139,14 @@ pub async fn install_rust_support(
 pub async fn install_rustup(
     window: Window,
     app: tauri::AppHandle,
-    selected_variant: Option<&String>,
+    _selected_variant: Option<&String>,
 ) -> Result<String, String> {
     // Check if rustup is already installed
-    match Command::new("rustup").arg("--version").output() {
-        Ok(output) => {
-            if output.status.success() {
-                info!("Rustup already installed");
-                return Ok("Rustup already installed".into());
-            }
+    if let Ok(output) = Command::new("rustup").arg("--version").output() {
+        if output.status.success() {
+            info!("Rustup already installed");
+            return Ok("Rustup already installed".into());
         }
-        Err(_) => {}
     }
 
     info!("Installing rustup...");
@@ -191,9 +188,9 @@ pub async fn install_rustup(
 }
 
 async fn install_espup(
-    window: Window,
-    app: AppHandle,
-    selected_variant: Option<&String>,
+    _window: Window,
+    _app: AppHandle,
+    _selected_variant: Option<&String>,
 ) -> Result<String, String> {
     info!("Installing espup...");
 
@@ -263,7 +260,7 @@ async fn install_espup(
 async fn install_rust_toolchain(
     window: Window,
     app: AppHandle,
-    selected_variant: Option<&String>,
+    _selected_variant: Option<&String>,
 ) -> Result<String, String> {
     info!("Installing Rust toolchain via espup... (this might take a while)");
 
@@ -274,6 +271,9 @@ async fn install_rust_toolchain(
         .unwrap()
         .to_string();
 
+    #[cfg(not(target_os = "windows"))]
+    let args = vec!["install"];
+    #[cfg(target_os = "windows")]
     let mut args = vec!["install"];
     // If there's a variant specified for Windows, pass it as a parameter
     #[cfg(target_os = "windows")]

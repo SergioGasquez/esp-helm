@@ -26,7 +26,7 @@ fn handle_serial(buff: &[u8], window: &Window) {
 
     // Emit the line to the frontend
     let payload = Payload {
-        pct: format!("{}", text).to_string(),
+        pct: text.to_string().to_string(),
     };
     window.emit("monitor-event", payload).unwrap();
 }
@@ -34,10 +34,7 @@ fn handle_serial(buff: &[u8], window: &Window) {
 fn is_abort_state(app: tauri::AppHandle) -> bool {
     let state_mutex = app.state::<Mutex<AppState>>();
     let state = state_mutex.lock().unwrap();
-    match state.builder {
-        BuilderState::Abort => true,
-        _ => false,
-    }
+    matches!(state.builder, BuilderState::Abort)
 }
 
 pub fn get_serial_port_info(port_name: &str) -> io::Result<SerialPortInfo> {

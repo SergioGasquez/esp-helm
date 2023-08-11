@@ -70,7 +70,7 @@ pub async fn download_esp_idf(
     // If the file exists, check if it is not corrupted
     if dest_path.exists() {
         let is_file_corrupted = {
-            match check_zip(&dest_path) {
+            match check_zip(dest_path) {
                 Ok(()) => {
                     info!("ESP-IDF already downloaded.");
                     return Ok(());
@@ -109,7 +109,7 @@ fn check_zip(path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let mut archive = zip::ZipArchive::new(reader)?;
 
     for i in 0..archive.len() {
-        let file = archive.by_index(i)?;
+        let _file = archive.by_index(i)?;
     }
 
     Ok(())
