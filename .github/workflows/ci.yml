@@ -64,4 +64,4 @@ jobs:
       - name: Enable caching
         uses: Swatinem/rust-cache@v2
       - name: Cargo check
-        run: cargo check
+        run: cd src-tauri && cargo check
