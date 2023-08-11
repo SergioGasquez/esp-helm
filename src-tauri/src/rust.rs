@@ -10,6 +10,7 @@ use tokio::fs;
 use tokio::io::AsyncWriteExt;
 
 use crate::external_command;
+#[cfg(unix)]
 use crate::external_command::set_exec_permission;
 
 #[cfg(windows)]
@@ -139,7 +140,7 @@ pub async fn install_rust_support(
 pub async fn install_rustup(
     window: Window,
     app: tauri::AppHandle,
-    _selected_variant: Option<&String>,
+    selected_variant: Option<&String>,
 ) -> Result<String, String> {
     // Check if rustup is already installed
     if let Ok(output) = Command::new("rustup").arg("--version").output() {
@@ -260,7 +261,7 @@ async fn install_espup(
 async fn install_rust_toolchain(
     window: Window,
     app: AppHandle,
-    _selected_variant: Option<&String>,
+    selected_variant: Option<&String>,
 ) -> Result<String, String> {
     info!("Installing Rust toolchain via espup... (this might take a while)");
 
@@ -322,7 +323,7 @@ async fn install_vc_tools_and_sdk(window: Window, app: tauri::AppHandle) -> Resu
     let tmp_dir = env::temp_dir();
     let file_path = tmp_dir.join("vs_buildtools.exe");
     fs::write(&file_path, &bytes).await;
-    info!(format!("Starting installer at {:?}", &file_path.display()));
+    info!("Starting installer at {:?}", &file_path.display());
 
     // Run the installer with the necessary components
     let args = [
